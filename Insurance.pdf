@@ -1,0 +1,113 @@
+use vivash_216;
+
+i) Create tables with primary keys and foreign keys
+
+CREATE TABLE PERSON (
+	driver_id VARCHAR(10) PRIMARY KEY,
+    name VARCHAR(100),
+    address VARCHAR(255)
+    );
+    
+CREATE TABLE CAR (
+    reg_num VARCHAR(20) PRIMARY KEY,
+    model VARCHAR(100),
+    year INT
+);
+
+
+CREATE TABLE ACCIDENT (
+    report_num INT (4) PRIMARY KEY,
+    accident_date DATE,
+    location VARCHAR(255)
+);
+
+CREATE TABLE OWNS (
+    driver_id VARCHAR(10),
+    reg_num VARCHAR(20),
+    PRIMARY KEY (driver_id, reg_num),
+    FOREIGN KEY (driver_id) REFERENCES PERSON(driver_id),
+    FOREIGN KEY (reg_num) REFERENCES CAR(reg_num)
+);
+
+CREATE TABLE PARTICIPATED (
+    driver_id VARCHAR(10),
+    reg_num VARCHAR(20),
+    report_num INT(4),
+    damage_amount INT(10),
+    PRIMARY KEY (driver_id, reg_num, report_num),
+    FOREIGN KEY (driver_id, reg_num) REFERENCES OWNS(driver_id, reg_num),
+    FOREIGN KEY (report_num) REFERENCES ACCIDENT(report_num)
+);
+
+
+-- ii) Enter sample data
+-- Sample data for PERSON table
+INSERT INTO PERSON VALUES 
+('D001', 'John Doe', '123 Main St'),
+('D002', 'Jane Smith', '456 Elm St'),
+('D003', 'Michael Johnson', '789 Oak St'),
+('D004', 'Emily Brown', '101 Pine St'),
+('D005', 'David Wilson', '202 Maple St');
+
+insert into PERSON value ('D006','Emma',' 345 Molo dt');
+delete from PERSON where driver_id='D006';
+
+
+-- Sample data for CAR table
+INSERT INTO CAR VALUES 
+('KA053408', 'Toyota Camry', 2008),
+('NY123456', 'Honda Accord', 2010),
+('CA789012', 'Ford Mustang', 2006),
+('TX654321', 'Chevrolet Malibu', 2009),
+('FL098765', 'Nissan Altima', 2007);
+
+-- Sample data for ACCIDENT table
+INSERT INTO ACCIDENT VALUES 
+(10, '2008-05-15', 'Intersection of 1st and Main'),
+(11, '2008-07-20', 'Highway 101'),
+(12, '2008-09-10', 'City Center'),
+(13, '2008-11-05', 'Old Town Square'),
+(14, '2008-12-25', 'Suburban Road');
+
+-- Sample data for OWNS table
+INSERT INTO OWNS VALUES 
+('D001', 'KA053408'),
+('D002', 'NY123456'),
+('D003', 'CA789012'),
+('D004', 'TX654321'),
+('D005', 'FL098765');
+
+-- Sample data for PARTICIPATED table
+INSERT INTO PARTICIPATED VALUES 
+('D001', 'KA053408', 12, 5000),
+('D002', 'NY123456', 11, 10000),
+('D003', 'CA789012', 10, 7500),
+('D004', 'TX654321', 13, 12000),
+('D005', 'FL098765', 14, 8000);
+
+select * from OWNS order by driver_id;
+
+select * from PARTICIPATED; 
+
+-- iii) Update damage amount
+UPDATE PARTICIPATED
+SET damage_amount = 25000
+WHERE reg_num = 'KA053408' AND report_num = 12;
+
+
+select * from PERSON;
+-- iv) Total number of people who owned cars involved in accidents in 2008
+
+SELECT COUNT(DISTINCT p.driver_id)
+FROM PERSON p
+JOIN OWNS o ON p.driver_id = o.driver_id
+JOIN PARTICIPATED pa ON o.reg_num = pa.reg_num
+JOIN ACCIDENT a ON pa.report_num = a.report_num
+WHERE YEAR(a.accident_date) = 2008;
+
+-- v) Number of accidents involving cars of a specific model
+SELECT COUNT(*)
+FROM PARTICIPATED pa
+JOIN CAR c ON pa.reg_num = c.reg_num
+WHERE c.model = 'Toyota Camry'; -- Example model: Toyota Camry
+
